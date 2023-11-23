@@ -1037,6 +1037,14 @@ class TFGenerationMixin:
                 model_kwargs["attention_mask"] = tf.concat(
                     [attention_mask, tf.ones((shape_list(attention_mask)[0], 1), dtype=tf.int32)], axis=-1
                 )
+            if "position_ids" in model_kwargs:
+                position_ids = model_kwargs["position_ids"]
+                num_positions = [[shape_list(position_ids)[-1]]]
+                new_pos_tensor = tf.convert_to_tensor(num_positions, dtype=position_ids.dtype)
+                new_pos_tensor = tf.tile(new_pos_tensor, (shape_list(position_ids)[0], 1))
+                model_kwargs["position_ids"] = tf.concat(
+                    [position_ids, new_pos_tensor ], axis=-1
+                )
 
         return model_kwargs
 
